@@ -164,8 +164,8 @@ for line in tabela:
                 if(download_images=='S'):
                     if not os.path.exists(path+'\\'+str(id_product)):
                         os.makedirs(path+'\\'+str(id_product))
-                    urllib.request.urlretrieve(link, path+'\\'+str(id_product)+'\\'+nome_link+'.jpg')
-                imagens_links=imagens_links+link+'|'
+                    urllib.request.urlretrieve(link, path+'\\'+nome_link+'.jpg')
+                imagens_links=imagens_links+link+';'
                 
         except:
             imagem = driver.find_element(By.XPATH,"//li[@class='fotoGrandeProd']//a//img")
@@ -184,18 +184,15 @@ for line in tabela:
                 if not os.path.exists(path+'\\'+str(id_product)):
                     os.makedirs(path+'\\'+str(id_product))
                     
-                urllib.request.urlretrieve(link, path+'\\'+str(id_product)+'\\'+nome_img+'.jpg')
+                urllib.request.urlretrieve(link, path+'\\'+nome_img+'.jpg')
         detalhes = driver.find_element(By.XPATH,"//div[@id='navInfoProdutos']//div[@class='boxAba']//div[@class='content']")     
         url_atual = driver.current_url
-        ws.append([str(id_product),str(url_atual),str(codigo_produto_final),str(nome_produto_final),str(imagens_links),str(conteudo),str(conteudo_html),str(detalhes.text),str(detalhes.get_attribute('innerHTML')),str(certificados),str(certificados_html)])
+        ws.append([str(id_product),str(url_atual),str(codigo_produto_final),str(nome_produto_final),str(imagens_links),str(conteudo),str(conteudo_html),str(detalhes.text),str(detalhes.get_attribute('innerHTML')),str(certificados),str(certificados_html),str(categorias_final)])
         wb.save(config.get("Credenciais", "xlsx_file"))
         comando = "INSERT INTO produtos (id_produto) VALUES ('"+str(id_product)+"');"
         cursor.execute(comando)
         conexao.commit()
-        if(kk==4):
-            break;
-        else:
-            kk+=1
+
     else:
         print('Produto '+str(id_product)+'já foi extraido')
     
