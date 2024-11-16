@@ -106,14 +106,10 @@ for line in tabela:
         nome_produto   = nome_produto.split('<label')
         nome_produto   = nome_produto[0]
         
-        nome_produto   = nome_produto.replace('\n','')
-        nome_produto   = nome_produto.replace('  ','')
-        nome_produto_final   = nome_produto.strip()
         
         codigo_produto = driver.find_element(By.XPATH,"//label[@id='codigoProduto']")
         codigo_produto = codigo_produto.get_attribute('innerHTML')
-        codigo_produto = codigo_produto.replace('\n','')
-        codigo_produto_final = codigo_produto.strip()
+        
         descricaoProd  = driver.find_element(By.XPATH,"//div[@class='descricaoProd']")
         auxiliar_html = descricaoProd.get_attribute('innerHTML')
  
@@ -124,6 +120,8 @@ for line in tabela:
         conteudo = ''
         conteudo_html = ''
         certificados_html = ''
+        garantia =''
+        garantia_html=''
         
         #captura dos certificados e conteudos
         if(len(auxiliar)>1):
@@ -132,7 +130,9 @@ for line in tabela:
             certificados = auxiliar[1]
             certificados_html = auxiliar_html[1]
             certificados = certificados.split('Garantia legal:')
+            garantia = 'Garantia legal:'+str(certificados[1])
             certificados_html = certificados_html.split('<p style="margin-left: 5px; padding-bottom: 10px;">Garantia legal:')
+            garantia_html = '<p style="margin-left: 5px; padding-bottom: 10px;">Garantia legal:'+str(certificados[1])
             certificados = certificados[0]
             certificados_html = certificados_html[0]
             conteudo     = conteudo.replace('\n','')
@@ -141,7 +141,9 @@ for line in tabela:
             conteudo_html = auxiliar_html[0]
             conteudo = auxiliar[0]
             conteudo = conteudo.split('Garantia legal:')
+            garantia = 'Garantia legal:'+str(conteudo[1])
             conteudo_html = conteudo_html.split('<p style="margin-left: 5px; padding-bottom: 10px;">Garantia legal:')
+            garantia_html = '<p style="margin-left: 5px; padding-bottom: 10px;">Garantia legal:'+str(conteudo_html[1])
             conteudo = conteudo[0]
             conteudo_html = conteudo_html[0]
             conteudo =  conteudo.replace('\n','')
@@ -154,6 +156,7 @@ for line in tabela:
             path = config.get('Credenciais','imagens_path')
             for i in imagens:
                 link = i.get_attribute("src")
+                link = link.replace('50_','600_')
                 link = link.replace('https','http')
                 nome_link = link
                 nome_link = nome_link.split('.jpg')
@@ -162,8 +165,7 @@ for line in tabela:
                 nome_link = nome_link[1]
                 
                 if(download_images=='S'):
-                    if not os.path.exists(path+'\\'+str(id_product)):
-                        os.makedirs(path+'\\'+str(id_product))
+ 
                     urllib.request.urlretrieve(link, path+'\\'+nome_link+'.jpg')
                 imagens_links=imagens_links+link+';'
                 
@@ -173,6 +175,7 @@ for line in tabela:
             imagens_links = ''
             path = config.get('Credenciais','imagens_path')
             link = imagem.get_attribute("src")
+            link = link.replace('50_','600_')
             link = link.replace('https','http')
             nome_img = link.split('.jpg')
             nome_img = nome_img[0]
@@ -181,13 +184,12 @@ for line in tabela:
             imagens_links = link
             if(download_images=='S'):
                 
-                if not os.path.exists(path+'\\'+str(id_product)):
-                    os.makedirs(path+'\\'+str(id_product))
+ 
                     
                 urllib.request.urlretrieve(link, path+'\\'+nome_img+'.jpg')
         detalhes = driver.find_element(By.XPATH,"//div[@id='navInfoProdutos']//div[@class='boxAba']//div[@class='content']")     
         url_atual = driver.current_url
-        ws.append([str(id_product),str(url_atual),str(codigo_produto_final),str(nome_produto_final),str(imagens_links),str(conteudo),str(conteudo_html),str(detalhes.text),str(detalhes.get_attribute('innerHTML')),str(certificados),str(certificados_html),str(categorias_final)])
+        ws.append([str(id_product),str(url_atual),str(codigo_produto),str(nome_produto),str(imagens_links),str(conteudo),str(conteudo_html),str(detalhes.text),str(detalhes.get_attribute('innerHTML')),str(certificados),str(certificados_html),str(categorias_final),str(garantia),str(garantia_html)])
         wb.save(config.get("Credenciais", "xlsx_file"))
         comando = "INSERT INTO produtos (id_produto) VALUES ('"+str(id_product)+"');"
         cursor.execute(comando)
